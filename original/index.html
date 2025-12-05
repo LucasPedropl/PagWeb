@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>PagWeb - Dashboard</title>
+
+		<!-- Tailwind CSS -->
+		<script src="https://cdn.tailwindcss.com"></script>
+
+		<!-- Lucide Icons -->
+		<script src="https://unpkg.com/lucide@latest"></script>
+
+		<!-- Google Fonts: Inter -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+
+		<style>
+			/* Estilos personalizados */
+			body {
+				font-family: 'Inter', sans-serif;
+				background-color: #f8fafc; /* slate-50 */
+			}
+
+			/* Estilização da barra de rolagem */
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+			::-webkit-scrollbar-track {
+				background: #f1f5f9; /* slate-100 */
+			}
+			::-webkit-scrollbar-thumb {
+				background: #cbd5e1; /* slate-300 */
+				border-radius: 10px;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: #94a3b8; /* slate-400 */
+			}
+
+			/* Classes para a transição da barra lateral */
+			.sidebar-transition {
+				transition: width 0.3s ease-in-out, padding 0.3s ease-in-out;
+			}
+			.main-content-transition {
+				transition: margin-left 0.3s ease-in-out;
+			}
+
+			/* Estilos para o gráfico de linha (placeholder) */
+			.line-chart-path {
+				stroke: #1e293b; /* slate-800 */
+				stroke-width: 2;
+				fill: none;
+			}
+
+			/* Estilos para o gráfico de rosca (placeholder) */
+			.donut-chart-segment {
+				stroke-width: 20;
+				fill: none;
+			}
+			.page-content {
+				display: none;
+			}
+			.page-content.active {
+				display: block;
+			}
+			.is-collapsed .nav-link {
+				justify-content: center;
+			}
+			.is-collapsed .nav-link i {
+				width: 2rem; /* 32px */
+				height: 2rem; /* 32px */
+			}
+
+			/* Estilo do menu mobile */
+			#mobile-menu-content {
+				transition: transform 0.3s ease-out;
+			}
+			#mobile-menu.hidden #mobile-menu-content {
+				transform: translateY(100%);
+			}
+
+			/* Ajustes para formulários de autenticação */
+			.auth-card {
+				max-width: 48rem; /* 768px */
+				width: 100%;
+			}
+			.auth-card input[type='text'],
+			.auth-card input[type='email'],
+			.auth-card input[type='password'] {
+				min-height: 3rem; /* garante inputs maiores */
+			}
+			/* Em telas pequenas mantenha margem confortável */
+			@media (max-width: 640px) {
+				.auth-card {
+					padding: 1.25rem;
+				}
+			}
+		</style>
+	</head>
+	<body class="antialiased text-slate-700">
+		<!-- Container da Aplicação Principal (Dashboard) -->
+		<div id="app-container">
+			<div class="relative min-h-screen flex">
+				<!-- Barra Lateral (Desktop) -->
+				<aside
+					id="sidebar"
+					class="bg-white text-slate-700 w-64 flex-col fixed inset-y-0 left-0 transform sidebar-transition z-30 border-r border-slate-200 hidden md:flex"
+				>
+					<!-- Logo Section -->
+					<div
+						class="px-6 flex items-center justify-between h-[65px] border-b border-slate-200"
+					>
+						<a
+							href="#"
+							class="text-slate-800 text-2xl font-bold flex items-center space-x-2"
+						>
+							<i
+								data-lucide="gem"
+								class="w-7 h-7 text-slate-800"
+							></i>
+							<span class="sidebar-text">PagWeb</span>
+						</a>
+					</div>
+
+					<!-- Navegação -->
+					<nav class="flex-grow px-4 pt-4">
+						<ul class="space-y-2" id="nav-links">
+							<li>
+								<a
+									href="#"
+									class="nav-link flex items-center space-x-3 py-2.5 px-4 rounded-lg"
+									data-target="page-overview"
+									><i data-lucide="home"></i
+									><span class="sidebar-text"
+										>Overview</span
+									></a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="nav-link flex items-center space-x-3 py-2.5 px-4 rounded-lg"
+									data-target="page-clientes"
+									><i data-lucide="users"></i
+									><span class="sidebar-text"
+										>Clientes</span
+									></a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="nav-link flex items-center space-x-3 py-2.5 px-4 rounded-lg"
+									data-target="page-assinaturas"
+									><i data-lucide="credit-card"></i
+									><span class="sidebar-text"
+										>Assinaturas</span
+									></a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="nav-link flex items-center space-x-3 py-2.5 px-4 rounded-lg"
+									data-target="page-pagamentos"
+									><i data-lucide="dollar-sign"></i
+									><span class="sidebar-text"
+										>Pagamentos</span
+									></a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="nav-link flex items-center space-x-3 py-2.5 px-4 rounded-lg"
+									data-target="page-relatorios"
+									><i data-lucide="bar-chart-2"></i
+									><span class="sidebar-text"
+										>Relatórios</span
+									></a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="nav-link flex items-center space-x-3 py-2.5 px-4 rounded-lg"
+									data-target="page-historico"
+									><i data-lucide="activity"></i
+									><span class="sidebar-text"
+										>Histórico</span
+									></a
+								>
+							</li>
+						</ul>
+					</nav>
+
+					<!-- Menu de Configurações -->
+					<div
+						class="px-4 h-[65px] flex items-center border-t border-slate-200"
+					>
+						<a
+							href="#"
+							class="nav-link flex items-center space-x-3 py-2.5 px-4 rounded-lg w-full"
+							data-target="page-configuracoes"
+							><i data-lucide="settings"></i
+							><span class="sidebar-text">Configurações</span></a
+						>
+					</div>
+
+					<!-- Botão para fechar a barra lateral -->
+					<button
+						id="toggle-sidebar-btn"
+						class="absolute top-[65px] right-0 transform -translate-y-1/2 translate-x-1/2 bg-white border border-slate-300 text-slate-600 rounded-md w-7 h-7 flex items-center justify-center p-1 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 transition-all duration-300"
+					>
+						<i
+							data-lucide="chevron-left"
+							id="toggle-sidebar-icon"
+							class="w-5 h-5 transition-transform duration-300"
+						></i>
+					</button>
+				</aside>
+
+				<!-- Conteúdo Principal -->
+				<div
+					id="main-content"
+					class="flex-1 md:ml-64 main-content-transition pb-20 md:pb-0"
+				>
+					<!-- Header -->
+					<header
+						class="bg-white border-b border-slate-200 sticky top-0 z-20"
+					>
+						<div class="px-4 sm:px-6 lg:px-8">
+							<div
+								class="flex items-center justify-between h-16 -mb-px"
+							>
+								<div class="flex items-center space-x-2">
+									<a
+										href="#"
+										class="text-slate-800 text-2xl font-bold flex items-center md:hidden"
+									>
+										<i
+											data-lucide="gem"
+											class="w-7 h-7 text-slate-800"
+										></i>
+									</a>
+									<div class="relative hidden sm:block">
+										<span
+											class="absolute inset-y-0 left-0 flex items-center pl-3"
+											><i
+												data-lucide="search"
+												class="w-5 h-5 text-slate-400"
+											></i
+										></span>
+										<input
+											type="search"
+											placeholder="Buscar..."
+											class="w-full sm:w-56 md:w-80 pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition"
+										/>
+									</div>
+								</div>
+								<div
+									class="flex items-center space-x-2 sm:space-x-4"
+								>
+									<button
+										class="sm:hidden p-2 rounded-full text-slate-500 hover:bg-slate-100"
+									>
+										<i data-lucide="search"></i>
+									</button>
+									<button
+										class="hidden sm:inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 bg-slate-800 text-white hover:bg-slate-900"
+									>
+										<i
+											data-lucide="plus"
+											class="w-4 h-4 mr-2"
+										></i>
+										Novo Cliente
+									</button>
+									<button
+										class="p-2 rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-600 transition"
+									>
+										<i data-lucide="bell"></i>
+									</button>
+									<div class="relative">
+										<button
+											id="user-menu-button"
+											class="flex items-center space-x-3 cursor-pointer"
+										>
+											<img
+												src="https://placehold.co/40x40/E2E8F0/475569?text=A"
+												alt="Avatar do usuário"
+												class="w-10 h-10 rounded-full"
+											/>
+											<div
+												class="hidden sm:block text-left"
+											>
+												<span
+													class="font-semibold text-slate-800"
+													>Admin</span
+												>
+												<p
+													class="text-sm text-slate-500"
+												>
+													ERP System
+												</p>
+											</div>
+										</button>
+										<div
+											id="user-menu"
+											class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-slate-200"
+										>
+											<a
+												href="#"
+												id="logout-button"
+												class="flex items-center w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+											>
+												<i
+													data-lucide="log-out"
+													class="w-4 h-4 mr-2"
+												></i>
+												Sair
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</header>
+
+					<!-- Conteúdo da Página -->
+					<main class="p-4 sm:p-6 lg:p-8">
+						<!-- Página de Overview -->
+						<div id="page-overview" class="page-content space-y-8">
+							<div>
+								<h1 class="text-3xl font-bold text-slate-800">
+									Dashboard Overview
+								</h1>
+								<p class="text-slate-500 mt-1">
+									Bem-vindo de volta! Aqui está o que está
+									acontecendo hoje.
+								</p>
+							</div>
+							<div
+								class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+							>
+								<div
+									class="bg-white p-6 rounded-xl border border-slate-200"
+								>
+									<div
+										class="flex justify-between items-start"
+									>
+										<div>
+											<p
+												class="text-sm font-medium text-slate-500"
+											>
+												Faturamento Total
+											</p>
+											<p
+												class="text-3xl font-bold text-slate-800 mt-2"
+											>
+												R$ 328.000
+											</p>
+											<p
+												class="text-sm text-green-500 flex items-center mt-1"
+											>
+												<i
+													data-lucide="arrow-up-right"
+													class="w-4 h-4 mr-1"
+												></i
+												><span>+12.5%</span>
+												<span
+													class="text-slate-500 ml-1"
+													>do último mês</span
+												>
+											</p>
+										</div>
+										<div
+											class="bg-slate-100 text-slate-600 p-2.5 rounded-lg"
+										>
+											<i data-lucide="dollar-sign"></i>
+										</div>
+									</div>
+								</div>
+								<div
+									class="bg-white p-6 rounded-xl border border-slate-200"
+								>
+									<div
+										class="flex justify-between items-start"
+									>
+										<div>
+											<p
+												class="text-sm font-medium text-slate-500"
+											>
+												Clientes Ativos
+											</p>
+											<p
+												class="text-3xl font-bold text-slate-800 mt-2"
+											>
+												147
+											</p>
+											<p
+												class="text-sm text-green-500 flex items-center mt-1"
+											>
+												<i
+													data-lucide="arrow-up-right"
+													class="w-4 h-4 mr-1"
+												></i
+												><span>+8</span>
+												<span
+													class="text-slate-500 ml-1"
+													>nesta semana</span
+												>
+											</p>
+										</div>
+										<div
+											class="bg-sky-100 text-sky-600 p-2.5 rounded-lg"
+										>
+											<i data-lucide="users"></i>
+										</div>
+									</div>
+								</div>
+								<div
+									class="bg-white p-6 rounded-xl border border-slate-200"
+								>
+									<div
+										class="flex justify-between items-start"
+									>
+										<div>
+											<p
+												class="text-sm font-medium text-slate-500"
+											>
+												Taxa de Conversão
+											</p>
+											<p
+												class="text-3xl font-bold text-slate-800 mt-2"
+											>
+												15.3%
+											</p>
+											<p
+												class="text-sm text-red-500 flex items-center mt-1"
+											>
+												<i
+													data-lucide="arrow-down-right"
+													class="w-4 h-4 mr-1"
+												></i
+												><span>-2.1%</span>
+												<span
+													class="text-slate-500 ml-1"
+													>do último mês</span
+												>
+											</p>
+										</div>
+										<div
+											class="bg-emerald-100 text-emerald-600 p-2.5 rounded-lg"
+										>
+											<i data-lucide="pie-chart"></i>
+										</div>
+									</div>
+								</div>
+								<div
+									class="bg-white p-6 rounded-xl border border-slate-200"
+								>
+									<div
+										class="flex justify-between items-start"
+									>
+										<div>
+											<p
+												class="text-sm font-medium text-slate-500"
+											>
+												Mensalidades Atrasadas
+											</p>
+											<p
+												class="text-3xl font-bold text-slate-800 mt-2"
+											>
+												23
+											</p>
+											<p
+												class="text-sm text-orange-500 flex items-center mt-1"
+											>
+												<i
+													data-lucide="alert-triangle"
+													class="w-4 h-4 mr-1"
+												></i
+												><span>12</span>
+												<span
+													class="text-slate-500 ml-1"
+													>vencidas</span
+												>
+											</p>
+										</div>
+										<div
+											class="bg-orange-100 text-orange-600 p-2.5 rounded-lg"
+										>
+											<i data-lucide="calendar-clock"></i>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+								<div
+									class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200"
+								>
+									<h3
+										class="text-lg font-semibold text-slate-800"
+									>
+										Tendência de Faturamento
+									</h3>
+									<div class="h-80 mt-4 relative">
+										<svg
+											class="w-full h-full"
+											viewBox="0 0 500 200"
+											preserveAspectRatio="none"
+										>
+											<line
+												x1="30"
+												y1="0"
+												x2="30"
+												y2="180"
+												stroke="#e2e8f0"
+												stroke-width="1"
+											/>
+											<text
+												x="25"
+												y="180"
+												font-size="10"
+												text-anchor="end"
+												fill="#64748b"
+											>
+												0
+											</text>
+											<text
+												x="25"
+												y="135"
+												font-size="10"
+												text-anchor="end"
+												fill="#64748b"
+											>
+												20k
+											</text>
+											<text
+												x="25"
+												y="90"
+												font-size="10"
+												text-anchor="end"
+												fill="#64748b"
+											>
+												40k
+											</text>
+											<text
+												x="25"
+												y="45"
+												font-size="10"
+												text-anchor="end"
+												fill="#64748b"
+											>
+												60k
+											</text>
+											<text
+												x="25"
+												y="5"
+												font-size="10"
+												text-anchor="end"
+												fill="#64748b"
+											>
+												80k
+											</text>
+											<line
+												x1="30"
+												y1="180"
+												x2="500"
+												y2="180"
+												stroke="#e2e8f0"
+												stroke-width="1"
+											/>
+											<text
+												x="60"
+												y="195"
+												font-size="10"
+												text-anchor="middle"
+												fill="#64748b"
+											>
+												Jan
+											</text>
+											<text
+												x="135"
+												y="195"
+												font-size="10"
+												text-anchor="middle"
+												fill="#64748b"
+											>
+												Fev
+											</text>
+											<text
+												x="210"
+												y="195"
+												font-size="10"
+												text-anchor="middle"
+												fill="#64748b"
+											>
+												Mar
+											</text>
+											<text
+												x="285"
+												y="195"
+												font-size="10"
+												text-anchor="middle"
+												fill="#64748b"
+											>
+												Abr
+											</text>
+											<text
+												x="360"
+												y="195"
+												font-size="10"
+												text-anchor="middle"
+												fill="#64748b"
+											>
+												Mai
+											</text>
+											<text
+												x="435"
+												y="195"
+												font-size="10"
+												text-anchor="middle"
+												fill="#64748b"
+											>
+												Jun
+											</text>
+											<path
+												class="line-chart-path"
+												d="M 60 112 L 135 120 L 210 115 L 285 95 L 360 100 L 435 80"
+											/>
+										</svg>
+									</div>
+								</div>
+								<div
+									class="bg-white p-6 rounded-xl border border-slate-200"
+								>
+									<h3
+										class="text-lg font-semibold text-slate-800"
+									>
+										Fontes dos Clientes
+									</h3>
+									<div
+										class="h-64 flex items-center justify-center mt-4"
+									>
+										<svg
+											width="200"
+											height="200"
+											viewBox="0 0 200 200"
+										>
+											<circle
+												class="donut-chart-segment"
+												cx="100"
+												cy="100"
+												r="80"
+												stroke="#3b82f6"
+												stroke-dasharray="251.2 251.2"
+												stroke-dashoffset="0"
+											></circle>
+											<circle
+												class="donut-chart-segment"
+												cx="100"
+												cy="100"
+												r="80"
+												stroke="#10b981"
+												stroke-dasharray="125.6 376.8"
+												stroke-dashoffset="-251.2"
+											></circle>
+											<circle
+												class="donut-chart-segment"
+												cx="100"
+												cy="100"
+												r="80"
+												stroke="#f59e0b"
+												stroke-dasharray="75.36 427.04"
+												stroke-dashoffset="-376.8"
+											></circle>
+											<circle
+												class="donut-chart-segment"
+												cx="100"
+												cy="100"
+												r="80"
+												stroke="#ef4444"
+												stroke-dasharray="50.24 452.16"
+												stroke-dashoffset="-452.16"
+											></circle>
+										</svg>
+									</div>
+									<div class="mt-4 space-y-2 text-sm">
+										<div
+											class="flex items-center justify-between"
+										>
+											<span class="flex items-center"
+												><span
+													class="w-3 h-3 rounded-full bg-blue-500 mr-2"
+												></span
+												>Website</span
+											>
+											<span>50%</span>
+										</div>
+										<div
+											class="flex items-center justify-between"
+										>
+											<span class="flex items-center"
+												><span
+													class="w-3 h-3 rounded-full bg-emerald-500 mr-2"
+												></span
+												>Indicação</span
+											>
+											<span>25%</span>
+										</div>
+										<div
+											class="flex items-center justify-between"
+										>
+											<span class="flex items-center"
+												><span
+													class="w-3 h-3 rounded-full bg-amber-500 mr-2"
+												></span
+												>Mídia Social</span
+											>
+											<span>15%</span>
+										</div>
+										<div
+											class="flex items-center justify-between"
+										>
+											<span class="flex items-center"
+												><span
+													class="w-3 h-3 rounded-full bg-red-500 mr-2"
+												></span
+												>Outros</span
+											>
+											<span>10%</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Página de Clientes -->
+						<div id="page-clientes" class="page-content">
+							<h1 class="text-3xl font-bold text-slate-800">
+								Gestão de Clientes
+							</h1>
+							<div
+								class="mt-8 bg-white p-6 rounded-xl border border-slate-200 overflow-x-auto"
+							>
+								<table class="w-full text-left min-w-[640px]">
+									<thead>
+										<tr class="border-b border-slate-200">
+											<th
+												class="py-3 px-4 text-sm font-semibold text-slate-600"
+											>
+												Nome
+											</th>
+											<th
+												class="py-3 px-4 text-sm font-semibold text-slate-600"
+											>
+												Status
+											</th>
+											<th
+												class="py-3 px-4 text-sm font-semibold text-slate-600"
+											>
+												Plano
+											</th>
+											<th
+												class="py-3 px-4 text-sm font-semibold text-slate-600"
+											>
+												Data de Adesão
+											</th>
+											<th
+												class="py-3 px-4 text-sm font-semibold text-slate-600"
+											>
+												Ações
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr
+											class="border-b border-slate-100 hover:bg-slate-50"
+										>
+											<td class="py-3 px-4">
+												João da Silva
+											</td>
+											<td class="py-3 px-4">
+												<span
+													class="bg-green-100 text-green-700 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full"
+													>Ativo</span
+												>
+											</td>
+											<td class="py-3 px-4">Premium</td>
+											<td class="py-3 px-4">
+												15/08/2023
+											</td>
+											<td class="py-3 px-4 space-x-2">
+												<button
+													class="text-slate-500 hover:text-slate-800"
+												>
+													<i
+														data-lucide="edit-2"
+														class="w-4 h-4"
+													></i></button
+												><button
+													class="text-slate-500 hover:text-red-600"
+												>
+													<i
+														data-lucide="trash-2"
+														class="w-4 h-4"
+													></i>
+												</button>
+											</td>
+										</tr>
+										<tr
+											class="border-b border-slate-100 hover:bg-slate-50"
+										>
+											<td class="py-3 px-4">
+												Maria Oliveira
+											</td>
+											<td class="py-3 px-4">
+												<span
+													class="bg-red-100 text-red-700 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full"
+													>Inativo</span
+												>
+											</td>
+											<td class="py-3 px-4">Básico</td>
+											<td class="py-3 px-4">
+												01/03/2023
+											</td>
+											<td class="py-3 px-4 space-x-2">
+												<button
+													class="text-slate-500 hover:text-slate-800"
+												>
+													<i
+														data-lucide="edit-2"
+														class="w-4 h-4"
+													></i></button
+												><button
+													class="text-slate-500 hover:text-red-600"
+												>
+													<i
+														data-lucide="trash-2"
+														class="w-4 h-4"
+													></i>
+												</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<!-- Página de Assinaturas -->
+						<div id="page-assinaturas" class="page-content">
+							<h1 class="text-3xl font-bold text-slate-800">
+								Assinaturas e Planos
+							</h1>
+							<div
+								class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+							>
+								<div
+									class="bg-white p-6 rounded-xl border border-slate-200 text-center"
+								>
+									<h3 class="text-lg font-semibold">
+										Plano Básico
+									</h3>
+									<p class="text-3xl font-bold mt-2">
+										R$ 49<span
+											class="text-lg font-normal text-slate-500"
+											>/mês</span
+										>
+									</p>
+									<ul
+										class="text-left space-y-2 mt-4 text-slate-600"
+									>
+										<li class="flex items-center">
+											<i
+												data-lucide="check"
+												class="w-4 h-4 text-green-500 mr-2"
+											></i
+											>Funcionalidade 1
+										</li>
+										<li class="flex items-center">
+											<i
+												data-lucide="check"
+												class="w-4 h-4 text-green-500 mr-2"
+											></i
+											>Funcionalidade 2
+										</li>
+									</ul>
+									<button
+										class="mt-6 w-full h-10 px-4 py-2 bg-slate-100 text-slate-800 hover:bg-slate-200 rounded-md text-sm font-medium"
+									>
+										Gerenciar Plano
+									</button>
+								</div>
+								<div
+									class="bg-white p-6 rounded-xl border-2 border-slate-800 text-center relative"
+								>
+									<span
+										class="absolute top-0 -translate-y-1/2 bg-slate-800 text-white text-xs font-semibold px-3 py-1 rounded-full"
+										>POPULAR</span
+									>
+									<h3 class="text-lg font-semibold">
+										Plano Premium
+									</h3>
+									<p class="text-3xl font-bold mt-2">
+										R$ 99<span
+											class="text-lg font-normal text-slate-500"
+											>/mês</span
+										>
+									</p>
+									<ul
+										class="text-left space-y-2 mt-4 text-slate-600"
+									>
+										<li class="flex items-center">
+											<i
+												data-lucide="check"
+												class="w-4 h-4 text-green-500 mr-2"
+											></i
+											>Todas as do Básico
+										</li>
+										<li class="flex items-center">
+											<i
+												data-lucide="check"
+												class="w-4 h-4 text-green-500 mr-2"
+											></i
+											>Funcionalidade 3
+										</li>
+										<li class="flex items-center">
+											<i
+												data-lucide="check"
+												class="w-4 h-4 text-green-500 mr-2"
+											></i
+											>Funcionalidade 4
+										</li>
+									</ul>
+									<button
+										class="mt-6 w-full h-10 px-4 py-2 bg-slate-800 text-white hover:bg-slate-900 rounded-md text-sm font-medium"
+									>
+										Gerenciar Plano
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Página de Pagamentos -->
+						<div id="page-pagamentos" class="page-content">
+							<h1 class="text-3xl font-bold text-slate-800">
+								Histórico de Pagamentos
+							</h1>
+							<div
+								class="mt-8 bg-white p-6 rounded-xl border border-slate-200 overflow-x-auto"
+							>
+								<table class="w-full text-left min-w-[640px]">
+									<thead>
+										<tr class="border-b border-slate-200">
+											<th
+												class="py-3 px-4 text-sm font-semibold text-slate-600"
+											>
+												ID Transação
+											</th>
+											<th
+												class="py-3 px-4 text-sm font-semibold text-slate-600"
+											>
+												Cliente
+											</th>
+											<th
+												class="py-3 px-4 text-sm font-semibold text-slate-600"
+											>
+												Valor
+											</th>
+											<th
+												class="py-3 px-4 text-sm font-semibold text-slate-600"
+											>
+												Status
+											</th>
+											<th
+												class="py-3 px-4 text-sm font-semibold text-slate-600"
+											>
+												Data
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr
+											class="border-b border-slate-100 hover:bg-slate-50"
+										>
+											<td
+												class="py-3 px-4 font-mono text-xs"
+											>
+												#A1B2-C3D4
+											</td>
+											<td class="py-3 px-4">
+												João da Silva
+											</td>
+											<td class="py-3 px-4">R$ 99,00</td>
+											<td class="py-3 px-4">
+												<span
+													class="bg-green-100 text-green-700 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full"
+													>Pago</span
+												>
+											</td>
+											<td class="py-3 px-4">
+												15/09/2023
+											</td>
+										</tr>
+										<tr
+											class="border-b border-slate-100 hover:bg-slate-50"
+										>
+											<td
+												class="py-3 px-4 font-mono text-xs"
+											>
+												#E5F6-G7H8
+											</td>
+											<td class="py-3 px-4">
+												Carla Souza
+											</td>
+											<td class="py-3 px-4">R$ 49,00</td>
+											<td class="py-3 px-4">
+												<span
+													class="bg-orange-100 text-orange-700 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full"
+													>Pendente</span
+												>
+											</td>
+											<td class="py-3 px-4">
+												18/09/2023
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<!-- Página de Relatórios -->
+						<div id="page-relatorios" class="page-content">
+							<h1 class="text-3xl font-bold text-slate-800">
+								Relatórios
+							</h1>
+							<div
+								class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+							>
+								<div
+									class="bg-white p-6 rounded-xl border border-slate-200 flex flex-col items-start"
+								>
+									<div
+										class="bg-slate-100 text-slate-600 p-2.5 rounded-lg"
+									>
+										<i data-lucide="file-text"></i>
+									</div>
+									<h3 class="text-lg font-semibold mt-4">
+										Faturamento Mensal
+									</h3>
+									<p class="text-sm text-slate-500 mt-1">
+										Visão detalhada do faturamento por
+										período.
+									</p>
+									<button
+										class="mt-4 text-sm font-semibold text-slate-800 hover:text-black"
+									>
+										Gerar Relatório &rarr;
+									</button>
+								</div>
+								<div
+									class="bg-white p-6 rounded-xl border border-slate-200 flex flex-col items-start"
+								>
+									<div
+										class="bg-slate-100 text-slate-600 p-2.5 rounded-lg"
+									>
+										<i data-lucide="user-plus"></i>
+									</div>
+									<h3 class="text-lg font-semibold mt-4">
+										Novos Clientes
+									</h3>
+									<p class="text-sm text-slate-500 mt-1">
+										Acompanhe o crescimento da sua base de
+										clientes.
+									</p>
+									<button
+										class="mt-4 text-sm font-semibold text-slate-800 hover:text-black"
+									>
+										Gerar Relatório &rarr;
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Página de Histórico -->
+						<div id="page-historico" class="page-content">
+							<h1 class="text-3xl font-bold text-slate-800">
+								Histórico de Atividades
+							</h1>
+						</div>
+
+						<!-- Página de Configurações -->
+						<div id="page-configuracoes" class="page-content">
+							<h1 class="text-3xl font-bold text-slate-800">
+								Configurações
+							</h1>
+						</div>
+					</main>
+				</div>
+			</div>
+
+			<!-- Barra de Navegação Inferior (Mobile) -->
+			<footer
+				id="bottom-nav"
+				class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-t-lg z-40"
+			>
+				<div class="flex justify-around items-center h-16">
+					<a
+						href="#"
+						class="bottom-nav-link flex flex-col items-center justify-center text-slate-600"
+						data-target="page-overview"
+					>
+						<i data-lucide="home"></i>
+						<span class="text-xs mt-1">Início</span>
+					</a>
+					<a
+						href="#"
+						class="bottom-nav-link flex flex-col items-center justify-center text-slate-600"
+						data-target="page-clientes"
+					>
+						<i data-lucide="users"></i>
+						<span class="text-xs mt-1">Clientes</span>
+					</a>
+					<a
+						href="#"
+						class="bottom-nav-link flex flex-col items-center justify-center text-slate-600"
+						data-target="page-assinaturas"
+					>
+						<i data-lucide="credit-card"></i>
+						<span class="text-xs mt-1">Assinaturas</span>
+					</a>
+					<button
+						id="open-menu-btn"
+						class="flex flex-col items-center justify-center text-slate-600"
+					>
+						<i data-lucide="menu"></i>
+						<span class="text-xs mt-1">Menu</span>
+					</button>
+				</div>
+			</footer>
+
+			<!-- Menu Modal (Mobile) -->
+			<div id="mobile-menu" class="hidden md:hidden fixed inset-0 z-50">
+				<div
+					id="mobile-menu-overlay"
+					class="absolute inset-0 bg-black/50"
+				></div>
+				<div
+					id="mobile-menu-content"
+					class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-4 shadow-lg transform translate-y-full"
+				>
+					<div class="flex justify-between items-center mb-4">
+						<h2 class="font-bold text-lg text-slate-800">Menu</h2>
+						<button
+							id="close-menu-btn"
+							class="text-slate-500 hover:text-slate-800"
+						>
+							<i data-lucide="x"></i>
+						</button>
+					</div>
+
+					<div class="space-y-4">
+						<div>
+							<h3
+								class="text-sm font-semibold text-slate-500 mb-2 px-2"
+							>
+								Ações Rápidas
+							</h3>
+							<div class="grid grid-cols-3 gap-2">
+								<a
+									href="#"
+									class="flex flex-col items-center p-2 rounded-lg bg-slate-100 hover:bg-slate-200"
+								>
+									<i
+										data-lucide="user-plus"
+										class="text-slate-700"
+									></i>
+									<span
+										class="text-xs text-center mt-1 text-slate-700"
+										>Novo Cliente</span
+									>
+								</a>
+								<a
+									href="#"
+									class="mobile-menu-link flex flex-col items-center p-2 rounded-lg bg-slate-100 hover:bg-slate-200"
+									data-target="page-pagamentos"
+								>
+									<i
+										data-lucide="eye"
+										class="text-slate-700"
+									></i>
+									<span
+										class="text-xs text-center mt-1 text-slate-700"
+										>Ver Pagamentos</span
+									>
+								</a>
+								<a
+									href="#"
+									class="mobile-menu-link flex flex-col items-center p-2 rounded-lg bg-slate-100 hover:bg-slate-200"
+									data-target="page-relatorios"
+								>
+									<i
+										data-lucide="file-text"
+										class="text-slate-700"
+									></i>
+									<span
+										class="text-xs text-center mt-1 text-slate-700"
+										>Gerar Relatório</span
+									>
+								</a>
+							</div>
+						</div>
+						<div>
+							<h3
+								class="text-sm font-semibold text-slate-500 mb-2 px-2"
+							>
+								Navegação
+							</h3>
+							<div class="grid grid-cols-3 gap-2">
+								<a
+									href="#"
+									class="mobile-menu-link flex flex-col items-center p-2 rounded-lg bg-slate-100 hover:bg-slate-200"
+									data-target="page-pagamentos"
+									><i
+										data-lucide="dollar-sign"
+										class="text-slate-700"
+									></i
+									><span
+										class="text-xs text-center mt-1 text-slate-700"
+										>Pagamentos</span
+									></a
+								>
+								<a
+									href="#"
+									class="mobile-menu-link flex flex-col items-center p-2 rounded-lg bg-slate-100 hover:bg-slate-200"
+									data-target="page-relatorios"
+									><i
+										data-lucide="bar-chart-2"
+										class="text-slate-700"
+									></i
+									><span
+										class="text-xs text-center mt-1 text-slate-700"
+										>Relatórios</span
+									></a
+								>
+								<a
+									href="#"
+									class="mobile-menu-link flex flex-col items-center p-2 rounded-lg bg-slate-100 hover:bg-slate-200"
+									data-target="page-historico"
+									><i
+										data-lucide="activity"
+										class="text-slate-700"
+									></i
+									><span
+										class="text-xs text-center mt-1 text-slate-700"
+										>Histórico</span
+									></a
+								>
+								<a
+									href="#"
+									class="mobile-menu-link flex flex-col items-center p-2 rounded-lg bg-slate-100 hover:bg-slate-200"
+									data-target="page-configuracoes"
+									><i
+										data-lucide="settings"
+										class="text-slate-700"
+									></i
+									><span
+										class="text-xs text-center mt-1 text-slate-700"
+										>Configurações</span
+									></a
+								>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Container de Autenticação -->
+		<div
+			id="auth-container"
+			class="hidden min-h-screen flex items-center justify-center bg-slate-50 p-4"
+		>
+			<!-- Página de Login -->
+			<div id="page-login" class="page-content">
+				<div
+					class="w-full max-w-4xl md:max-w-2xl lg:max-w-3xl p-12 md:p-16 space-y-10 bg-white rounded-xl shadow-lg auth-card"
+				>
+					<div class="text-center">
+						<a
+							href="#"
+							class="text-slate-800 text-3xl font-bold flex items-center justify-center space-x-2"
+						>
+							<i
+								data-lucide="gem"
+								class="w-8 h-8 text-slate-800"
+							></i>
+							<span>PagWeb</span>
+						</a>
+						<h2 class="mt-4 text-xl font-semibold text-slate-700">
+							Acesse sua conta
+						</h2>
+					</div>
+					<form class="space-y-10">
+						<div>
+							<label
+								for="email"
+								class="text-sm font-medium text-slate-700"
+								>Email</label
+							>
+							<input
+								type="email"
+								name="email"
+								id="email"
+								class="mt-2 block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+								placeholder="voce@exemplo.com"
+								required
+							/>
+						</div>
+						<div>
+							<label
+								for="password"
+								class="text-sm font-medium text-slate-700"
+								>Senha</label
+							>
+							<input
+								type="password"
+								name="password"
+								id="password"
+								class="mt-2 block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+								placeholder="••••••••"
+								required
+							/>
+						</div>
+						<button
+							type="submit"
+							id="login-button"
+							class="w-full flex justify-center items-center h-12 py-2 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-slate-800 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+						>
+							Entrar
+						</button>
+					</form>
+					<div class="relative flex items-center justify-center">
+						<div class="flex-grow border-t border-slate-300"></div>
+						<span class="flex-shrink mx-4 text-sm text-slate-500"
+							>Ou entre com</span
+						>
+						<div class="flex-grow border-t border-slate-300"></div>
+					</div>
+					<div>
+						<button
+							type="button"
+							class="w-full flex items-center justify-center py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+						>
+							<svg
+								class="w-5 h-5 mr-2"
+								aria-hidden="true"
+								focusable="false"
+								data-prefix="fab"
+								data-icon="google"
+								role="img"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 488 512"
+							>
+								<path
+									fill="currentColor"
+									d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-72.2 72.2C297.1 114.5 273.5 104 248 104c-73.8 0-134.3 60.5-134.3 135s60.5 135 134.3 135c84.3 0 115.7-64.2 120.4-96.6H248v-85.3h236.1c2.3 12.7 3.9 26.9 3.9 41.4z"
+								></path>
+							</svg>
+							Entrar com Google
+						</button>
+					</div>
+					<p class="text-sm text-center text-slate-600">
+						Não tem uma conta?
+						<a
+							href="#"
+							id="go-to-register"
+							class="font-medium text-slate-800 hover:underline"
+							>Cadastre-se</a
+						>
+					</p>
+				</div>
+			</div>
+
+			<!-- Página de Cadastro -->
+			<div id="page-register" class="page-content">
+				<div
+					class="w-full max-w-4xl md:max-w-2xl lg:max-w-3xl p-12 md:p-16 space-y-10 bg-white rounded-xl shadow-lg auth-card"
+				>
+					<div class="text-center">
+						<a
+							href="#"
+							class="text-slate-800 text-3xl font-bold flex items-center justify-center space-x-2"
+						>
+							<i
+								data-lucide="gem"
+								class="w-8 h-8 text-slate-800"
+							></i>
+							<span>PagWeb</span>
+						</a>
+						<h2 class="mt-4 text-xl font-semibold text-slate-700">
+							Crie sua conta
+						</h2>
+					</div>
+					<form class="space-y-10">
+						<div>
+							<label
+								for="reg-name"
+								class="text-sm font-medium text-slate-700"
+								>Nome completo</label
+							>
+							<input
+								type="text"
+								name="reg-name"
+								id="reg-name"
+								class="mt-2 block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+								placeholder="Seu nome completo"
+								required
+							/>
+						</div>
+						<div>
+							<label
+								for="reg-email"
+								class="text-sm font-medium text-slate-700"
+								>Email</label
+							>
+							<input
+								type="email"
+								name="reg-email"
+								id="reg-email"
+								class="mt-2 block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+								placeholder="voce@exemplo.com"
+								required
+							/>
+						</div>
+						<div>
+							<label
+								for="reg-password"
+								class="text-sm font-medium text-slate-700"
+								>Senha</label
+							>
+							<input
+								type="password"
+								name="reg-password"
+								id="reg-password"
+								class="mt-2 block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+								placeholder="••••••••"
+								required
+							/>
+						</div>
+						<button
+							type="submit"
+							id="register-button"
+							class="w-full flex justify-center items-center h-12 py-2 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-slate-800 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+						>
+							Cadastrar
+						</button>
+					</form>
+					<p class="text-sm text-center text-slate-600">
+						Já tem uma conta?
+						<a
+							href="#"
+							id="go-to-login"
+							class="font-medium text-slate-800 hover:underline"
+							>Faça login</a
+						>
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// Inicializa os ícones do Lucide
+			lucide.createIcons();
+
+			// Controles da Aplicação
+			const appContainer = document.getElementById('app-container');
+			const authContainer = document.getElementById('auth-container');
+			const pages = document.querySelectorAll('.page-content');
+
+			// Controles da Barra Lateral
+			const sidebar = document.getElementById('sidebar');
+			const mainContent = document.getElementById('main-content');
+			const toggleBtn = document.getElementById('toggle-sidebar-btn');
+			const toggleIcon = document.getElementById('toggle-sidebar-icon');
+			const sidebarTexts = document.querySelectorAll('.sidebar-text');
+
+			// Controles do Menu Mobile
+			const mobileMenu = document.getElementById('mobile-menu');
+			const mobileMenuContent = document.getElementById(
+				'mobile-menu-content'
+			);
+			const openMenuBtn = document.getElementById('open-menu-btn');
+			const closeMenuBtn = document.getElementById('close-menu-btn');
+			const mobileMenuOverlay = document.getElementById(
+				'mobile-menu-overlay'
+			);
+
+			// Controles do Menu de Usuário
+			const userMenuButton = document.getElementById('user-menu-button');
+			const userMenu = document.getElementById('user-menu');
+
+			// Controles de Autenticação
+			const logoutButton = document.getElementById('logout-button');
+			const loginButton = document.getElementById('login-button');
+			const registerButton = document.getElementById('register-button');
+			const goToRegisterLink = document.getElementById('go-to-register');
+			const goToLoginLink = document.getElementById('go-to-login');
+
+			// Estado Simulado
+			let isLoggedIn = true;
+
+			// Função para mostrar a página correta (app ou auth)
+			function showPage(pageId) {
+				const isAuthPage =
+					pageId === 'page-login' || pageId === 'page-register';
+
+				if (isAuthPage) {
+					appContainer.classList.add('hidden');
+					authContainer.classList.remove('hidden');
+				} else {
+					if (!isLoggedIn) {
+						// Redireciona para login se não estiver logado
+						showPage('page-login');
+						return;
+					}
+					authContainer.classList.add('hidden');
+					appContainer.classList.remove('hidden');
+				}
+
+				pages.forEach((page) => {
+					page.classList.remove('active');
+				});
+				const targetPage = document.getElementById(pageId);
+				if (targetPage) {
+					targetPage.classList.add('active');
+				}
+
+				// Atualiza links ativos
+				updateActiveLinks(pageId);
+			}
+
+			function updateActiveLinks(pageId) {
+				const allNavLinks = document.querySelectorAll(
+					'.nav-link, .bottom-nav-link'
+				);
+				allNavLinks.forEach((link) => {
+					link.classList.remove(
+						'bg-slate-800',
+						'text-white',
+						'font-semibold',
+						'text-slate-900'
+					);
+					if (link.classList.contains('bottom-nav-link')) {
+						link.classList.add('text-slate-600');
+					}
+
+					if (link.dataset.target === pageId) {
+						if (link.classList.contains('bottom-nav-link')) {
+							link.classList.add('text-slate-900');
+							link.classList.remove('text-slate-600');
+						} else {
+							link.classList.add(
+								'bg-slate-800',
+								'text-white',
+								'font-semibold'
+							);
+						}
+					}
+				});
+			}
+
+			// ---- Event Listeners ----
+
+			// Navegação principal (desktop, mobile e menu mobile)
+			document
+				.querySelectorAll(
+					'.nav-link, .bottom-nav-link, .mobile-menu-link'
+				)
+				.forEach((link) => {
+					if (link.dataset.target) {
+						link.addEventListener('click', (e) => {
+							e.preventDefault();
+							showPage(link.dataset.target);
+							if (
+								mobileMenu &&
+								!mobileMenu.classList.contains('hidden')
+							) {
+								closeMobileMenu();
+							}
+						});
+					}
+				});
+
+			// Autenticação
+			logoutButton.addEventListener('click', (e) => {
+				e.preventDefault();
+				isLoggedIn = false;
+				userMenu.classList.add('hidden');
+				showPage('page-login');
+			});
+
+			loginButton.addEventListener('click', (e) => {
+				e.preventDefault();
+				isLoggedIn = true;
+				showPage('page-overview');
+			});
+
+			registerButton.addEventListener('click', (e) => {
+				e.preventDefault();
+				isLoggedIn = true;
+				showPage('page-overview');
+			});
+
+			goToRegisterLink.addEventListener('click', (e) => {
+				e.preventDefault();
+				showPage('page-register');
+			});
+			goToLoginLink.addEventListener('click', (e) => {
+				e.preventDefault();
+				showPage('page-login');
+			});
+
+			// Menu de Usuário
+			userMenuButton.addEventListener('click', () => {
+				userMenu.classList.toggle('hidden');
+			});
+			document.addEventListener('click', (e) => {
+				if (
+					!userMenuButton.contains(e.target) &&
+					!userMenu.contains(e.target)
+				) {
+					userMenu.classList.add('hidden');
+				}
+			});
+
+			// Lógica da Barra Lateral (Desktop)
+			if (sidebar && toggleBtn) {
+				const collapseSidebar = () => {
+					sidebar.classList.add('w-20', 'is-collapsed');
+					sidebar.classList.remove('w-64');
+					mainContent.classList.add('md:ml-20');
+					mainContent.classList.remove('md:ml-64');
+					toggleIcon.classList.add('rotate-180');
+					sidebarTexts.forEach((text) =>
+						text.classList.add('hidden')
+					);
+					localStorage.setItem('sidebarState', 'collapsed');
+				};
+				const expandSidebar = () => {
+					sidebar.classList.remove('w-20', 'is-collapsed');
+					sidebar.classList.add('w-64');
+					mainContent.classList.remove('md:ml-20');
+					mainContent.classList.add('md:ml-64');
+					toggleIcon.classList.remove('rotate-180');
+					sidebarTexts.forEach((text) =>
+						text.classList.remove('hidden')
+					);
+					localStorage.setItem('sidebarState', 'expanded');
+				};
+				toggleBtn.addEventListener('click', () => {
+					sidebar.classList.contains('w-64')
+						? collapseSidebar()
+						: expandSidebar();
+				});
+			}
+
+			// Lógica do Menu Mobile
+			const openMobileMenu = () => {
+				mobileMenu.classList.remove('hidden');
+				setTimeout(() => {
+					mobileMenuContent.classList.remove('translate-y-full');
+				}, 10);
+			};
+			const closeMobileMenu = () => {
+				mobileMenuContent.classList.add('translate-y-full');
+				setTimeout(() => {
+					mobileMenu.classList.add('hidden');
+				}, 300);
+			};
+			if (openMenuBtn)
+				openMenuBtn.addEventListener('click', openMobileMenu);
+			if (closeMenuBtn)
+				closeMenuBtn.addEventListener('click', closeMobileMenu);
+			if (mobileMenuOverlay)
+				mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+
+			// ---- Inicialização ----
+			document.addEventListener('DOMContentLoaded', () => {
+				if (isLoggedIn) {
+					showPage('page-overview');
+				} else {
+					showPage('page-login');
+				}
+
+				if (window.innerWidth >= 768) {
+					const sidebarState = localStorage.getItem('sidebarState');
+					if (sidebarState === 'collapsed' && sidebar) {
+						sidebar.classList.add('!transition-none');
+						mainContent.classList.add('!transition-none');
+						collapseSidebar();
+						setTimeout(() => {
+							sidebar.classList.remove('!transition-none');
+							mainContent.classList.remove('!transition-none');
+						}, 10);
+					}
+				}
+
+				// Re-renderiza ícones após a inicialização, para garantir que os ícones do auth apareçam
+				lucide.createIcons();
+			});
+		</script>
+	</body>
+</html>

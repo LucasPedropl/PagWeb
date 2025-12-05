@@ -1,0 +1,5 @@
+{
+  "name": "PagWeb Dashboard",
+  "description": "Dashboard administrativo PagWeb com gestão de clientes e relatórios via IA.",
+  "requestFramePermissions": []
+}
