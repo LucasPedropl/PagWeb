@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Sidebar } from './src/components/layout/aside/Sidebar';
@@ -7,6 +8,7 @@ import { ClientLayout } from './src/components/layout/ClientLayout';
 
 // Pages - Shared/Entry
 import { Welcome } from './src/pages/Welcome';
+import { DeveloperDocs } from './src/pages/DeveloperDocs';
 
 // Pages - Auth
 import { Login } from './src/app/(auth)/login';
@@ -62,6 +64,9 @@ const App: React.FC = () => {
       <Routes>
         {/* Entry Point */}
         <Route path="/" element={<Welcome />} />
+        
+        {/* Tech Docs */}
+        <Route path="/dev-docs" element={<DeveloperDocs />} />
 
         {/* Auth Group */}
         <Route path="/login" element={<Login />} />
