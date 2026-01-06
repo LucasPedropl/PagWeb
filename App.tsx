@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { AuthProvider } from './src/context/AuthContext';
 import { Sidebar } from './src/components/layout/aside/Sidebar';
 import { Navbar } from './src/components/layout/navBar/Navbar';
 import { MobileNav } from './src/components/layout/mobileNav';
@@ -60,45 +61,47 @@ const AdminLayout: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <HashRouter>
-      <Routes>
-        {/* Entry Point */}
-        <Route path="/" element={<Welcome />} />
-        
-        {/* Tech Docs */}
-        <Route path="/dev-docs" element={<DeveloperDocs />} />
+    <AuthProvider>
+      <HashRouter>
+        <Routes>
+          {/* Entry Point */}
+          <Route path="/" element={<Welcome />} />
+          
+          {/* Tech Docs */}
+          <Route path="/dev-docs" element={<DeveloperDocs />} />
 
-        {/* Auth Group */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/cadastro" element={<Cadastro />} />
-        <Route path="/client/login" element={<ClientLogin />} />
+          {/* Auth Group */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/client/login" element={<ClientLogin />} />
 
-        {/* Admin Group (Renamed from App to Admin) */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="empresas" element={<Empresas />} />
-          <Route path="planos" element={<Planos />} />
-          <Route path="assinaturas" element={<Assinaturas />} />
-          <Route path="pagamentos" element={<Pagamentos />} />
-          <Route path="relatorios" element={<Relatorios />} />
-          <Route path="historico" element={<Historico />} />
-          <Route path="configuracoes" element={<Configuracoes />} />
-          <Route path="suporte" element={<DuvidasSuporte />} />
-          <Route path="menu" element={<Menu />} />
-        </Route>
+          {/* Admin Group (Renamed from App to Admin) */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="empresas" element={<Empresas />} />
+            <Route path="planos" element={<Planos />} />
+            <Route path="assinaturas" element={<Assinaturas />} />
+            <Route path="pagamentos" element={<Pagamentos />} />
+            <Route path="relatorios" element={<Relatorios />} />
+            <Route path="historico" element={<Historico />} />
+            <Route path="configuracoes" element={<Configuracoes />} />
+            <Route path="suporte" element={<DuvidasSuporte />} />
+            <Route path="menu" element={<Menu />} />
+          </Route>
 
-        {/* Client Group */}
-        <Route path="/client" element={<ClientLayout />}>
-            <Route index element={<Navigate to="/client/dashboard" replace />} />
-            <Route path="dashboard" element={<ClientDashboard />} />
-            <Route path="faturas" element={<ClientFaturas />} />
-            <Route path="configuracoes" element={<ClientConfiguracoes />} />
-        </Route>
+          {/* Client Group */}
+          <Route path="/client" element={<ClientLayout />}>
+              <Route index element={<Navigate to="/client/dashboard" replace />} />
+              <Route path="dashboard" element={<ClientDashboard />} />
+              <Route path="faturas" element={<ClientFaturas />} />
+              <Route path="configuracoes" element={<ClientConfiguracoes />} />
+          </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </HashRouter>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </HashRouter>
+    </AuthProvider>
   );
 };
 

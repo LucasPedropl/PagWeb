@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export interface Client {
@@ -31,30 +32,21 @@ export interface Subscription {
   startDate: string; // DT Aquisição
   endDate?: string; // Dt Finalizar
   period?: number; // Periodo (meses)
-  isRecurring?: boolean; // Recorrente
-  discount?: number; // Desconto
-  paymentMethod?: 'Boleto' | 'Pix' | 'Cartão'; // Forma de Pagamento
-  observation?: string; // Observação
+  isRecurring?: boolean; // Rec
+  paymentMethod?: 'Boleto' | 'Pix' | 'Cartão';
+  discount?: number;
+  observation?: string;
 }
 
 export interface Transaction {
-  id: string;
-  clientId: string;
-  clientName: string;
-  amount: number;
-  status: 'Pago' | 'Pendente' | 'Falha' | 'Reembolsado';
-  date: string;
-  method: 'Cartão' | 'Boleto' | 'Pix';
-  reference: string;
-}
-
-export interface ActivityLog {
-  id: string;
-  user: string;
-  action: string;
-  target: string;
-  timestamp: string;
-  type: 'create' | 'update' | 'delete' | 'warning' | 'info';
+    id: string;
+    clientId: string;
+    clientName: string;
+    amount: number;
+    status: 'Pago' | 'Pendente' | 'Falha' | 'Reembolsado';
+    date: string;
+    method: 'Cartão' | 'Boleto' | 'Pix';
+    reference: string;
 }
 
 export interface NavItem {
@@ -64,7 +56,44 @@ export interface NavItem {
 }
 
 export enum ReportType {
-  FINANCIAL = 'Faturamento Mensal',
-  GROWTH = 'Novos Clientes',
-  CHURN = 'Cancelamentos'
+  FINANCIAL = 'Financeiro',
+  GROWTH = 'Crescimento',
+  OPERATIONAL = 'Operacional',
+  HR = 'Recursos Humanos'
+}
+
+export interface UserLoginDto {
+  email?: string;
+  password?: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  tipo: string;
+}
+
+export interface UserRegisterDto {
+  nome: string;
+  sobreNome: string;
+  cpf: string;
+  email: string;
+  password: string;
+  telefone: string;
+}
+
+export interface EmpresaCreateDto {
+    nome: string;
+    cnpj: string;
+    email: string;
+    password: string;
+    telefone: string;
+}
+
+export interface ActivityLog {
+    id: string;
+    user: string;
+    action: string;
+    target: string;
+    timestamp: string;
+    type: 'create' | 'update' | 'delete' | 'warning' | 'info';
 }

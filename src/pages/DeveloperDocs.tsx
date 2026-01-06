@@ -12,205 +12,249 @@ import {
   Tag,
   AlertCircle
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 interface Endpoint {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   path: string;
   description: string;
-  scope: 'Auth' | 'Admin/Empresa' | 'Cliente' | 'Global';
+  scope: 'Auth' | 'Admin' | 'Empresa' | 'Usuário' | 'Financeiro' | 'Global';
   payload?: any;
   response?: any;
 }
 
+// Endpoints extraídos do PDF
 const endpoints: Endpoint[] = [
-  // --- AUTH ---
+  // --- AUTH / USER ---
   { 
     method: 'POST', 
-    path: '/api/v1/auth/login', 
-    description: 'Autenticação centralizada com JWT', 
+    path: '/api/v1/User/login', 
+    description: 'Autenticação de usuário', 
     scope: 'Auth', 
-    payload: { email: 'string', password: 'string', type: 'admin | client' },
-    response: { token: 'string', user: { id: 'uuid', role: 'string' } }
+    payload: { email: 'string', password: 'string' },
+    response: { token: 'string', tipo: 'string' }
   },
   { 
     method: 'POST', 
-    path: '/api/v1/auth/register', 
-    description: 'Criação de conta Empresa (Tenant)', 
+    path: '/api/v1/User/register', 
+    description: 'Registro de novo usuário', 
     scope: 'Auth', 
-    payload: { companyName: 'string', adminEmail: 'string', password: 'string' } 
-  },
-  { 
-    method: 'POST', 
-    path: '/api/v1/auth/forgot-password', 
-    description: 'Solicitação de reset de senha via email', 
-    scope: 'Auth', 
-    payload: { email: 'string' } 
-  },
-
-  // --- ADMIN / EMPRESAS (GESTÃO DE CLIENTES) ---
-  { 
-    method: 'GET', 
-    path: '/api/v1/admin/clients', 
-    description: 'Listagem paginada de clientes PF', 
-    scope: 'Admin/Empresa' 
-  },
-  { 
-    method: 'POST', 
-    path: '/api/v1/admin/clients', 
-    description: 'Cadastro de novo cliente PF (Formulário Empresas)', 
-    scope: 'Admin/Empresa',
     payload: { 
-      firstName: 'string', 
-      lastName: 'string', 
-      cpf: 'string (mask)', 
+      nome: 'string', 
+      sobreNome: 'string', 
+      cpf: 'string', 
       email: 'string', 
-      phone: 'string',
-      address: { street: 'string', city: 'string', zip: 'string' }
-    }
+      password: 'string', 
+      telefone: 'string' 
+    } 
   },
-  { 
-    method: 'PATCH', 
-    path: '/api/v1/admin/clients/:id/status', 
-    description: 'Alteração rápida de status (Ativo/Inativo)', 
-    scope: 'Admin/Empresa',
-    payload: { status: 'string' }
+  {
+    method: 'PATCH',
+    path: '/api/v1/User/{id}',
+    description: 'Atualizar dados do usuário',
+    scope: 'Usuário',
+    payload: { /* Schema UserUpdateDto */ }
+  },
+  {
+    method: 'DELETE',
+    path: '/api/v1/User/{id}',
+    description: 'Remover usuário',
+    scope: 'Usuário'
+  },
+  
+  // --- ADMIN USER OPERATIONS ---
+  {
+    method: 'POST',
+    path: '/api/v1/User/admin/cliente',
+    description: 'Criar cliente via painel administrativo',
+    scope: 'Admin'
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/User/admin/assinatura',
+    description: 'Criar assinatura via painel administrativo',
+    scope: 'Admin'
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/User/admin/clientes',
+    description: 'Listar todos os clientes (Admin)',
+    scope: 'Admin'
   },
 
-  // --- PLANOS & ASSINATURAS ---
-  { 
-    method: 'GET', 
-    path: '/api/v1/admin/plans', 
-    description: 'Catálogo de planos para venda', 
-    scope: 'Admin/Empresa' 
+  // --- EMPRESA ---
+  {
+    method: 'POST',
+    path: '/api/v1/Empresa',
+    description: 'Cadastrar nova empresa',
+    scope: 'Empresa',
+    payload: { nome: 'string', cnpj: 'string', email: 'string', password: 'string', telefone: 'string' }
   },
-  { 
-    method: 'POST', 
-    path: '/api/v1/admin/plans', 
-    description: 'Criação de novo produto/plano', 
-    scope: 'Admin/Empresa',
-    payload: { name: 'string', price: 'number', features: 'string[]', isPopular: 'boolean' }
+  {
+    method: 'PATCH',
+    path: '/api/v1/Empresa/{id}',
+    description: 'Atualizar dados da empresa',
+    scope: 'Empresa',
+    payload: { /* Schema EmpresaUpdateDto */ }
   },
-  { 
-    method: 'POST', 
-    path: '/api/v1/admin/subscriptions', 
-    description: 'Vincular cliente a um plano (Checkout interno)', 
-    scope: 'Admin/Empresa',
+
+  // --- ASSINATURA ---
+  {
+    method: 'POST',
+    path: '/api/v1/Assinatura',
+    description: 'Criar nova assinatura',
+    scope: 'Empresa',
     payload: { 
-      clientId: 'uuid', 
-      planId: 'uuid', 
-      startDate: 'ISO8601', 
-      periodMonths: 'number', 
-      discount: 'number (percent)',
-      isRecurring: 'boolean'
+      idCliente: 0, 
+      idPlano: 0, 
+      periodo: 48, 
+      dataInicio: '2026-01-06T17:44:10.429Z', 
+      dataFim: '2026-01-06T17:44:10.429Z', 
+      desconto: 0, 
+      observacao: 'string' 
     }
   },
-
-  // --- FINANCEIRO & PAGAMENTOS ---
-  { 
-    method: 'GET', 
-    path: '/api/v1/admin/payments', 
-    description: 'Dashboard financeiro e conciliação', 
-    scope: 'Admin/Empresa' 
+  {
+    method: 'PATCH',
+    path: '/api/v1/Assinatura/{id}',
+    description: 'Atualizar assinatura existente',
+    scope: 'Empresa'
   },
-  { 
-    method: 'POST', 
-    path: '/api/v1/payments/:invoiceId/pix', 
-    description: 'Geração dinâmica de QR Code Pix', 
-    scope: 'Global',
-    response: { qrCode: 'base64', copyPaste: 'string' }
-  },
-  { 
-    method: 'POST', 
-    path: '/api/v1/webhooks/payment-provider', 
-    description: 'Recebimento de confirmação de pagamento (Assíncrono)', 
-    scope: 'Global',
-    payload: { transactionId: 'string', status: 'PAID | REFUNDED' }
+  {
+    method: 'GET',
+    path: '/api/v1/Assinatura/empresa',
+    description: 'Obter assinaturas da empresa logada',
+    scope: 'Empresa'
   },
 
-  // --- CLIENTE (PORTAL DO ASSINANTE) ---
-  { 
-    method: 'GET', 
-    path: '/api/v1/client/dashboard', 
-    description: 'Resumo da conta do assinante', 
-    scope: 'Cliente' 
+  // --- PLANO ---
+  {
+    method: 'POST',
+    path: '/api/v1/Plano',
+    description: 'Criar novo plano',
+    scope: 'Admin',
+    payload: { nome: 'string', valorMensalidade: 0, funcionalidades: ['string'] }
   },
-  { 
-    method: 'GET', 
-    path: '/api/v1/client/invoices', 
-    description: 'Histórico de faturas do cliente logado', 
-    scope: 'Cliente' 
+  {
+    method: 'PATCH',
+    path: '/api/v1/Plano/{id}',
+    description: 'Atualizar plano existente',
+    scope: 'Admin'
   },
-  { 
-    method: 'PUT', 
-    path: '/api/v1/client/profile', 
-    description: 'Atualização de dados cadastrais pelo cliente', 
-    scope: 'Cliente',
-    payload: { phone: 'string', email: 'string', address: 'string' }
+  {
+    method: 'DELETE',
+    path: '/api/v1/Plano/{id}',
+    description: 'Remover plano',
+    scope: 'Admin'
   },
 
-  // --- IA & LOGS ---
-  { 
-    method: 'POST', 
-    path: '/api/v1/ai/analyze-report', 
-    description: 'Envio de dados para análise Gemini', 
-    scope: 'Admin/Empresa',
-    payload: { type: 'financial | growth', dataContext: 'text/json' }
+  // --- MENSALIDADE ---
+  {
+    method: 'GET',
+    path: '/api/v1/Mensalidade/empresa',
+    description: 'Listar mensalidades da empresa',
+    scope: 'Financeiro'
   },
-  { 
-    method: 'GET', 
-    path: '/api/v1/admin/audit-logs', 
-    description: 'Trilha de auditoria do sistema', 
-    scope: 'Admin/Empresa' 
+  {
+    method: 'PATCH',
+    path: '/api/v1/Mensalidade/{id}',
+    description: 'Atualizar mensalidade',
+    scope: 'Financeiro'
   },
+  {
+    method: 'DELETE',
+    path: '/api/v1/Mensalidade/{id}',
+    description: 'Remover mensalidade',
+    scope: 'Financeiro'
+  },
+
+  // --- ENDEREÇO ---
+  {
+    method: 'POST',
+    path: '/api/v1/Endereco/usuario',
+    description: 'Cadastrar endereço para usuário',
+    scope: 'Usuário',
+    payload: { rua: 'string', numero: 'string', bairro: 'string', cidade: 'string', estado: 'string', cep: 'string' }
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/Endereco/empresa',
+    description: 'Cadastrar endereço para empresa',
+    scope: 'Empresa',
+    payload: { rua: 'string', numero: 'string', bairro: 'string', cidade: 'string', estado: 'string', cep: 'string' }
+  },
+  {
+    method: 'PATCH',
+    path: '/api/v1/Endereco/{id}',
+    description: 'Atualizar endereço',
+    scope: 'Global'
+  }
 ];
 
+// Schemas extraídos do PDF
 const schemas = [
   {
-    name: 'Client (PF)',
-    scope: 'Empresas/Clientes',
+    name: 'UserRegistrationDto',
+    scope: 'Auth',
     fields: [
-      { name: 'id', type: 'UUID', desc: 'Identificador único global' },
-      { name: 'firstName', type: 'String', desc: 'Nome do cliente' },
-      { name: 'cpf', type: 'String', desc: 'CPF sem pontuação (11 dígitos)' },
-      { name: 'email', type: 'Email', desc: 'Email principal para faturas' },
-      { name: 'status', type: 'Enum', desc: 'Ativo, Inativo, Pendente' },
-      { name: 'joinDate', type: 'Date', desc: 'Data de cadastro' }
+      { name: 'nome', type: 'String', desc: 'Primeiro nome' },
+      { name: 'sobreNome', type: 'String', desc: 'Sobrenome' },
+      { name: 'cpf', type: 'String', desc: 'CPF sem formatação' },
+      { name: 'email', type: 'String', desc: 'Email válido' },
+      { name: 'password', type: 'String', desc: 'Senha' },
+      { name: 'telefone', type: 'String', desc: 'Telefone de contato' }
     ]
   },
   {
-    name: 'Subscription',
-    scope: 'Assinaturas',
+    name: 'EmpresaCreateDto',
+    scope: 'Empresa',
     fields: [
-      { name: 'id', type: 'UUID', desc: 'ID da assinatura' },
-      { name: 'clientId', type: 'UUID', desc: 'Referência ao cliente' },
-      { name: 'planId', type: 'UUID', desc: 'Referência ao plano' },
-      { name: 'price', type: 'Decimal', desc: 'Preço final após descontos' },
-      { name: 'period', type: 'Integer', desc: 'Duração em meses' },
-      { name: 'isRecurring', type: 'Boolean', desc: 'Se renova automaticamente' },
-      { name: 'nextBilling', type: 'Date', desc: 'Data da próxima cobrança' }
+      { name: 'nome', type: 'String', desc: 'Razão social ou fantasia' },
+      { name: 'cnpj', type: 'String', desc: 'CNPJ da empresa' },
+      { name: 'email', type: 'String', desc: 'Email corporativo' },
+      { name: 'password', type: 'String', desc: 'Senha de acesso' },
+      { name: 'telefone', type: 'String', desc: 'Telefone principal' }
     ]
   },
   {
-    name: 'Invoice (Fatura)',
-    scope: 'Pagamentos / Cliente',
+    name: 'AssinaturaCreateDto',
+    scope: 'Assinatura',
     fields: [
-      { name: 'id', type: 'UUID', desc: 'ID da fatura' },
-      { name: 'reference', type: 'String', desc: 'Mês/Ano de referência' },
-      { name: 'amount', type: 'Decimal', desc: 'Valor total' },
-      { name: 'dueDate', type: 'Date', desc: 'Data de vencimento' },
-      { name: 'status', type: 'Enum', desc: 'Pago, Pendente, Atrasado, Cancelado' },
-      { name: 'barcode', type: 'String', desc: 'Linha digitável do boleto' }
+      { name: 'idCliente', type: 'Integer', desc: 'ID do Cliente' },
+      { name: 'idPlano', type: 'Integer', desc: 'ID do Plano contratado' },
+      { name: 'periodo', type: 'Integer', desc: 'Período em meses (ex: 48)' },
+      { name: 'dataInicio', type: 'DateTime', desc: 'ISO 8601 Date' },
+      { name: 'dataFim', type: 'DateTime', desc: 'ISO 8601 Date' },
+      { name: 'desconto', type: 'Double', desc: 'Valor ou percentual de desconto' },
+      { name: 'observacao', type: 'String', desc: 'Notas adicionais' }
     ]
   },
   {
-    name: 'Transaction',
-    scope: 'Gateway de Pagamento',
+    name: 'PlanoCreateDto',
+    scope: 'Plano',
     fields: [
-      { name: 'id', type: 'String', desc: 'ID no gateway externo' },
-      { name: 'method', type: 'Enum', desc: 'PIX, CREDIT_CARD, BOLETO' },
-      { name: 'status', type: 'String', desc: 'Mapeamento direto do provedor' },
-      { name: 'processedAt', type: 'DateTime', desc: 'Data exata da liquidação' }
+      { name: 'nome', type: 'String', desc: 'Nome do plano' },
+      { name: 'valorMensalidade', type: 'Double', desc: 'Valor da mensalidade' },
+      { name: 'funcionalidades', type: 'Array<String>', desc: 'Lista de features' }
+    ]
+  },
+  {
+    name: 'EnderecoInputDto',
+    scope: 'Endereco',
+    fields: [
+      { name: 'rua', type: 'String', desc: 'Logradouro' },
+      { name: 'numero', type: 'String', desc: 'Número' },
+      { name: 'bairro', type: 'String', desc: 'Bairro' },
+      { name: 'cidade', type: 'String', desc: 'Cidade' },
+      { name: 'estado', type: 'String', desc: 'UF' },
+      { name: 'cep', type: 'String', desc: 'CEP' }
+    ]
+  },
+  {
+    name: 'LoginResponse',
+    scope: 'Auth',
+    fields: [
+      { name: 'token', type: 'String', desc: 'JWT Token Bearer' },
+      { name: 'tipo', type: 'String', desc: 'Role do usuário (ex: Admin)' }
     ]
   }
 ];
@@ -223,24 +267,24 @@ export const DeveloperDocs: React.FC = () => {
     ? endpoints 
     : endpoints.filter(e => e.scope === filterScope);
 
-  const scopes = ['All', 'Auth', 'Admin/Empresa', 'Cliente', 'Global'];
+  const scopes = ['All', 'Auth', 'Admin', 'Empresa', 'Usuário', 'Financeiro'];
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-300 font-sans">
       {/* Header */}
       <header className="h-16 border-b border-slate-800 bg-[#020617]/95 backdrop-blur-md sticky top-0 z-50 flex items-center justify-between px-8">
         <div className="flex items-center gap-6">
-          <Link to="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+          <a href="#/" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-medium">Voltar</span>
-          </Link>
+          </a>
           <div className="h-6 w-px bg-slate-800"></div>
           <div className="flex items-center gap-3">
             <div className="bg-cyan-500/20 p-1.5 rounded-lg">
                 <Code2 className="text-cyan-400" size={20} />
             </div>
             <h1 className="font-bold text-white tracking-tight">
-              API Engine <span className="text-slate-500 font-mono text-xs ml-2">v2.4.0-beta</span>
+              API Engine <span className="text-slate-500 font-mono text-xs ml-2">v1.0 (BixAPI)</span>
             </h1>
           </div>
         </div>
@@ -271,8 +315,8 @@ export const DeveloperDocs: React.FC = () => {
             <div>
                 <h3 className="text-white font-bold text-lg">Guia para o Backend</h3>
                 <p className="text-slate-400 text-sm mt-1 max-w-3xl leading-relaxed">
-                    Esta documentação reflete a necessidade exata do frontend PagWeb. 
-                    Todos os endpoints devem suportar CORS, retornar JSON e utilizar códigos de status HTTP semânticos (200, 201, 400, 401, 403, 500).
+                    Documentação gerada a partir do Swagger BixAPI V1. Utilize os endpoints abaixo para integração.
+                    Todas as chamadas requerem token JWT no header <code>Authorization: Bearer</code> (exceto login/register).
                 </p>
             </div>
         </div>
@@ -299,16 +343,16 @@ export const DeveloperDocs: React.FC = () => {
               {filteredEndpoints.map((ep, idx) => (
                 <div key={idx} className="bg-[#0f172a] rounded-2xl border border-slate-800/50 hover:border-cyan-500/40 transition-all overflow-hidden">
                   <div className="p-5 flex flex-wrap items-center gap-4">
-                    <div className={`w-16 py-1 rounded text-[10px] font-black text-center
-                      ${ep.method === 'GET' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 
-                        ep.method === 'POST' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 
-                        ep.method === 'PUT' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 
-                        ep.method === 'PATCH' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
-                        'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                    <div className={`w-20 py-1 rounded text-[10px] font-black text-center uppercase border
+                      ${ep.method === 'GET' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
+                        ep.method === 'POST' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 
+                        ep.method === 'PUT' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 
+                        ep.method === 'PATCH' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                        'bg-red-500/10 text-red-400 border-red-500/20'}`}>
                       {ep.method}
                     </div>
                     <code className="text-white font-mono font-bold text-sm bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">{ep.path}</code>
-                    <span className="text-slate-400 text-xs font-medium">{ep.description}</span>
+                    <span className="text-slate-400 text-xs font-medium flex-1">{ep.description}</span>
                     
                     <div className="ml-auto flex items-center gap-2">
                         <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-800/50 rounded-full text-[10px] font-bold text-slate-400 border border-slate-700">
@@ -330,7 +374,7 @@ export const DeveloperDocs: React.FC = () => {
                         )}
                         {ep.response && (
                             <div className="space-y-2">
-                                <label className="text-[10px] uppercase font-black text-slate-600 tracking-widest ml-1">Success Response (200 OK)</label>
+                                <label className="text-[10px] uppercase font-black text-slate-600 tracking-widest ml-1">Response Example</label>
                                 <div className="bg-[#020617] rounded-xl p-4 text-xs font-mono border border-slate-800 overflow-x-auto">
                                     <pre className="text-emerald-500/90">{JSON.stringify(ep.response, null, 2)}</pre>
                                 </div>
@@ -385,28 +429,6 @@ export const DeveloperDocs: React.FC = () => {
                     </div>
                 ))}
             </div>
-
-            {/* HTTP Status Reference */}
-            <section className="bg-slate-900/30 rounded-2xl border border-slate-800 p-8">
-                <h3 className="text-white font-bold flex items-center gap-2 mb-6">
-                    <AlertCircle className="text-amber-500" size={20} />
-                    Standard HTTP Responses
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {[
-                        { code: '200/201', label: 'Success', desc: 'Operação realizada com sucesso.' },
-                        { code: '400', label: 'Bad Request', desc: 'Payload inválido ou erro de validação.' },
-                        { code: '401/403', label: 'Auth Error', desc: 'Token ausente ou sem permissão.' },
-                        { code: '404', label: 'Not Found', desc: 'Recurso não encontrado.' },
-                    ].map(st => (
-                        <div key={st.code}>
-                            <div className="text-white font-bold font-mono">{st.code}</div>
-                            <div className="text-cyan-500 text-[10px] font-black uppercase mt-1">{st.label}</div>
-                            <div className="text-slate-500 text-xs mt-1">{st.desc}</div>
-                        </div>
-                    ))}
-                </div>
-            </section>
           </div>
         )}
 
@@ -417,12 +439,12 @@ export const DeveloperDocs: React.FC = () => {
                 </div>
                 <div>
                     <p className="text-white font-bold text-sm">Pronto para Integrar?</p>
-                    <p className="text-slate-500 text-xs">Utilize o Postman ou Insomnia para testes rápidos.</p>
+                    <p className="text-slate-500 text-xs">Todos os endpoints foram mapeados da documentação oficial.</p>
                 </div>
             </div>
             <div className="text-slate-600 text-[10px] font-mono uppercase tracking-widest text-center md:text-right">
-                PagWeb Frontend Engine &copy; 2024<br/>
-                All Rights Reserved
+                PagWeb BixAPI V1 &copy; 2026<br/>
+                System Documentation
             </div>
         </footer>
       </main>
