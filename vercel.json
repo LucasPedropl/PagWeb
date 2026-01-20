@@ -1,0 +1,13 @@
+
+{
+  "rewrites": [
+    {
+      "source": "/api-proxy/:match*",
+      "destination": "https://lojas.vlks.com.br/api/v1/:match*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

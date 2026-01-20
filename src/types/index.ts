@@ -65,6 +65,7 @@ export enum ReportType {
 export interface UserLoginDto {
   email?: string;
   password?: string;
+  adminLogin?: boolean;
 }
 
 export interface LoginResponse {
@@ -81,12 +82,18 @@ export interface UserRegisterDto {
   telefone: string;
 }
 
+export interface UserActivateDto {
+  email: string;
+  token: string;
+}
+
 export interface EmpresaCreateDto {
     nome: string;
     cnpj: string;
     email: string;
     password: string;
     telefone: string;
+    idAdmin?: number;
 }
 
 export interface ActivityLog {

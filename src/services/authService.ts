@@ -1,36 +1,43 @@
 
 import { apiRequest } from './api';
-import { UserLoginDto, LoginResponse, UserRegisterDto } from '../types';
-
-// Função auxiliar para gerar ID aleatório conforme solicitado
-const generateRandomId = () => Math.floor(Math.random() * 9000) + 1000;
+import { UserLoginDto, LoginResponse, UserRegisterDto, UserActivateDto } from '../types';
 
 export const authService = {
   /**
-   * Realiza o login do usuário (Admin ou Cliente)
+   * Realiza o login do usuário.
    * Endpoint: POST /api/v1/User/login
+   * Payload: { email, password, adminLogin: false }
    */
   login: async (credentials: UserLoginDto): Promise<LoginResponse> => {
+    // Força adminLogin como false conforme solicitado
+    const payload = {
+      ...credentials,
+      adminLogin: false
+    };
+
     return await apiRequest<LoginResponse>('/User/login', {
       method: 'POST',
-      body: JSON.stringify(credentials),
+      body: JSON.stringify(payload),
     });
   },
 
   /**
-   * Cadastra um novo Usuário (Admin ou Comum)
-   * Endpoint: POST /api/v1/User/register?tipo=X&idEmpresa=Y
-   * @param data Dados do formulário
-   * @param tipo 0 para usuário comum, 1 para admin/proprietário (default 1 para cadastro público)
+   * Cadastra um novo Usuário.
+   * Endpoint: POST /api/v1/User/register
    */
-  registerUser: async (data: UserRegisterDto, tipo: number = 1): Promise<void> => {
-    // Gera um ID de empresa aleatório conforme solicitado para o fluxo inicial
-    const idEmpresa = generateRandomId();
-    
-    // Constrói a URL com query params
-    const endpoint = `/User/register?tipo=${tipo}&idEmpresa=${idEmpresa}`;
+  registerUser: async (data: UserRegisterDto): Promise<void> => {
+    return await apiRequest<void>('/User/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
 
-    return await apiRequest<void>(endpoint, {
+  /**
+   * Ativa a conta do usuário via Token.
+   * Endpoint: POST /api/v1/User/activate
+   */
+  activateUser: async (data: UserActivateDto): Promise<void> => {
+    return await apiRequest<void>('/User/activate', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -40,6 +47,6 @@ export const authService = {
    * Recupera os dados do usuário logado (exemplo)
    */
   getMe: async (token: string): Promise<any> => {
-    return { name: 'Admin', role: 'Admin' }; 
+    return { name: 'Usuário', role: 'User' }; 
   }
 };

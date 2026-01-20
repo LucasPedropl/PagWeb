@@ -8,6 +8,7 @@ interface AuthContextData {
   isAuthenticated: boolean;
   isLoading: boolean;
   signIn: (credentials: UserLoginDto) => Promise<void>;
+  signInGuest: () => void;
   signOut: () => void;
 }
 
@@ -46,6 +47,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signInGuest = () => {
+    const token = 'guest-token';
+    const tipo = 'Guest';
+    localStorage.setItem('@PagWeb:token', token);
+    localStorage.setItem('@PagWeb:tipo', tipo);
+    setUser({ token, tipo });
+  };
+
   const signOut = () => {
     localStorage.removeItem('@PagWeb:token');
     localStorage.removeItem('@PagWeb:tipo');
@@ -53,7 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, signIn, signInGuest, signOut }}>
       {children}
     </AuthContext.Provider>
   );

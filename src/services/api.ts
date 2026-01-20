@@ -1,5 +1,8 @@
 
-export const API_URL = 'https://lojas.vlks.com.br/api/v1';
+// Alteramos para uma rota relativa. 
+// O vite.config.ts (local) e o vercel.json (produção) vão redirecionar 
+// tudo que começar com /api-proxy para https://lojas.vlks.com.br/api/v1
+export const API_URL = '/api-proxy';
 
 interface FetchOptions extends RequestInit {
   token?: string;
@@ -20,7 +23,8 @@ export async function apiRequest<T>(endpoint: string, options: FetchOptions = {}
   const response = await fetch(`${API_URL}${endpoint}`, config);
 
   if (!response.ok) {
-    const errorMessage = await response.text();
+    // Tenta ler o erro como texto, se falhar, usa o status
+    const errorMessage = await response.text().catch(() => `Erro HTTP ${response.status}`);
     throw new Error(errorMessage || `Erro na requisição: ${response.status}`);
   }
 

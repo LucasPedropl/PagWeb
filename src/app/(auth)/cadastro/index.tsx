@@ -48,12 +48,14 @@ export const Cadastro: React.FC = () => {
         telefone: unmask(formData.telefone)
       };
 
-      // Chama o serviço de registro (tipo 1 = Admin por padrão na tela de cadastro público)
-      await authService.registerUser(payload, 1);
+      await authService.registerUser(payload);
       
       setSuccess(true);
-      // Redirecionar após 2 segundos
-      setTimeout(() => navigate('/login'), 2000);
+      // Redireciona para a tela de ativação passando o email
+      setTimeout(() => {
+        navigate('/ativar', { state: { email: formData.email } });
+      }, 1500);
+      
     } catch (err: any) {
       console.error(err);
       setError('Erro ao criar conta. Verifique os dados e tente novamente.');
@@ -66,7 +68,7 @@ export const Cadastro: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
       <div className="w-full max-w-md p-8 sm:p-10 space-y-8 bg-white rounded-xl shadow-lg border border-slate-100 relative">
         
-        <Link to="/" className="absolute top-6 left-6 text-slate-400 hover:text-slate-600 transition-colors">
+        <Link to="/login" className="absolute top-6 left-6 text-slate-400 hover:text-slate-600 transition-colors">
           <ArrowLeft size={20} />
         </Link>
 
@@ -94,7 +96,7 @@ export const Cadastro: React.FC = () => {
         {success && (
           <div className="bg-emerald-50 text-emerald-600 p-3 rounded-lg text-sm flex items-center gap-2 border border-emerald-100">
             <Wallet size={16} />
-            Conta criada com sucesso! Redirecionando...
+            Cadastro realizado! Redirecionando para ativação...
           </div>
         )}
 
