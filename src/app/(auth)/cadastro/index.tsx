@@ -51,10 +51,10 @@ export const Cadastro: React.FC = () => {
       await authService.registerUser(payload);
       
       setSuccess(true);
-      // Redireciona para a tela de ativação passando o email
-      setTimeout(() => {
-        navigate('/ativar', { state: { email: formData.email } });
-      }, 1500);
+      
+      // Redireciona imediatamente para a tela de ativação
+      // Passamos o email via state para pré-preencher o campo
+      navigate('/ativar', { state: { email: formData.email } });
       
     } catch (err: any) {
       console.error(err);
@@ -96,7 +96,7 @@ export const Cadastro: React.FC = () => {
         {success && (
           <div className="bg-emerald-50 text-emerald-600 p-3 rounded-lg text-sm flex items-center gap-2 border border-emerald-100">
             <Wallet size={16} />
-            Cadastro realizado! Redirecionando para ativação...
+            Sucesso! Redirecionando para ativação...
           </div>
         )}
 

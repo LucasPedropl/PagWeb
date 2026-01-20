@@ -7,7 +7,7 @@ interface AuthContextData {
   user: { token: string; tipo: string } | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  signIn: (credentials: UserLoginDto) => Promise<void>;
+  signIn: (credentials: UserLoginDto) => Promise<LoginResponse>;
   signInGuest: () => void;
   signOut: () => void;
 }
@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadStorageData();
   }, []);
 
-  const signIn = async (credentials: UserLoginDto) => {
+  const signIn = async (credentials: UserLoginDto): Promise<LoginResponse> => {
     try {
       const response = await authService.login(credentials);
       
@@ -42,6 +42,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('@PagWeb:tipo', tipo);
 
       setUser({ token, tipo });
+      
+      // Retornamos a resposta para que o componente de Login possa decidir a rota
+      return response;
     } catch (error) {
       throw error;
     }

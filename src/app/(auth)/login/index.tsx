@@ -20,10 +20,17 @@ export const Login: React.FC = () => {
 
     try {
       // AdminLogin é setado como false dentro do service, conforme solicitado
-      await signIn({ email, password });
+      const response = await signIn({ email, password });
       
-      // Redireciona para a tela de seleção de perfil
-      navigate('/selecionar-perfil');
+      // Lógica de Redirecionamento baseada no Tipo de Usuário
+      if (response.tipo === 'Cliente') {
+        // Se for cliente, vai direto para o dashboard do cliente
+        navigate('/client/dashboard');
+      } else {
+        // Se for Empresa (ou outro tipo), vai para a seleção/criação de empresa
+        navigate('/selecionar-perfil');
+      }
+
     } catch (err: any) {
       console.error(err);
       setError('Falha na autenticação. Verifique suas credenciais.');
@@ -33,7 +40,7 @@ export const Login: React.FC = () => {
   };
 
   const handleGuestAccess = () => {
-    // Simula login de visitante
+    // Simula login de visitante -> Vai para seleção para ver as opções
     signInGuest();
     navigate('/selecionar-perfil');
   };
